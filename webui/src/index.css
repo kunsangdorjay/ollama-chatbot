@@ -1,0 +1,257 @@
+/* ================= THEME TOKENS ================= */
+:root {
+  html {
+    transition:
+      background-color 0.35s ease,
+      color 0.35s ease;
+  }
+  
+  body,
+  .app,
+  .sidebar,
+  .main,
+  .chat-area,
+  .input-shell,
+  .card,
+  textarea,
+  button {
+    transition:
+      background 0.35s ease,
+      background-color 0.35s ease,
+      color 0.25s ease,
+      border-color 0.25s ease;
+  }
+  
+  --bg: radial-gradient(1200px 600px at 50% -200px, #1b2a4a 0%, #0b0f19 60%);
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-strong: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.12);
+  --text: #e6e9ef;
+  --muted: #a1a8b3;
+  --accent: #4f8cff;
+  --assistant: rgba(255, 255, 255, 0.05);
+}
+
+/* 🌞 LIGHT MODE */
+:root[data-theme="light"] {
+  --bg: radial-gradient(1200px 600px at 50% -200px, #ffffff 0%, #f4f6fb 60%);
+  --surface: rgba(0, 0, 0, 0.03);
+  --surface-strong: rgba(0, 0, 0, 0.06);
+  --border: rgba(0, 0, 0, 0.12);
+  --text: #1f2937;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --assistant: rgba(0, 0, 0, 0.04);
+}
+
+/* ================= BASE ================= */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ================= LAYOUT ================= */
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+  width: 260px;
+  background: linear-gradient(
+    180deg,
+    var(--surface-strong),
+    var(--surface)
+  );
+  border-right: 1px solid var(--border);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(12px);
+}
+
+.new-chat {
+  background: linear-gradient(135deg, var(--accent), #6aa6ff);
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.theme-toggle {
+  margin-top: 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.chat-list {
+  margin-top: 14px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.chat-item {
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.chat-item.active {
+  background: rgba(79,140,255,0.18);
+  color: var(--text);
+}
+
+/* ================= MAIN ================= */
+.main {
+  flex: 1;
+  position: relative;
+}
+
+.chat-area {
+  max-width: 760px;
+  margin: auto;
+  padding: 40px 16px 140px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================= BUBBLES ================= */
+.card {
+  max-width: 68%;
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  border-radius: 18px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.card.assistant {
+  align-self: flex-start;
+  background: var(--assistant);
+  border: 1px solid var(--border);
+  border-top-left-radius: 6px;
+  backdrop-filter: blur(8px);
+}
+
+.card.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, var(--accent), #6aa6ff);
+  color: white;
+  border-top-right-radius: 6px;
+}
+
+/* ================= GREETING ================= */
+.empty {
+  text-align: center;
+  margin-top: 20vh;
+}
+
+.empty h1 {
+  font-size: 42px;
+  font-weight: 600;
+}
+
+.empty p {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.suggestions {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.suggestions button {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+/* ================= INPUT ================= */
+.input-shell {
+  position: fixed;
+  bottom: 24px;
+  left: calc(260px + 50%);
+  transform: translateX(-50%);
+  width: min(760px, calc(100% - 300px));
+  background: linear-gradient(
+    180deg,
+    var(--surface-strong),
+    var(--surface)
+  );
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 12px;
+  display: flex;
+  gap: 12px;
+  backdrop-filter: blur(14px);
+}
+
+textarea {
+  flex: 1;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 16px;
+}
+
+button {
+  background: linear-gradient(135deg, var(--accent), #6aa6ff);
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.stop {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* ================= MOTION ================= */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+textarea::placeholder {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: -0.01em;
+}
+/* Tighten assistant response bubble size */
+.card.assistant {
+  max-width: 62%;          /* was too wide */
+  padding: 12px 16px;      /* slightly tighter */
+  font-size: 15.5px;       /* subtle reduction */
+  line-height: 1.5;
+}
+.card.assistant p {
+  margin: 0.6em 0;
+}
