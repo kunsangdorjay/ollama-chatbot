@@ -154,6 +154,24 @@ export default function App() {
             + New chat
           </button>
 
+          {/* Vercel Status Badge */}
+          <div style={{
+            margin: "0 16px",
+            padding: "8px",
+            borderRadius: "6px",
+            background: "rgba(16, 185, 129, 0.1)",
+            color: "#10b981",
+            fontSize: "12px",
+            fontWeight: "bold",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            marginTop: "16px"
+          }}>
+            <span style={{ display: "inline-block", width: "8px", height: "8px", background: "#10b981", borderRadius: "50%" }}></span>
+            Vercel Deploy: Live
+          </div>
+
           {/* 🔹 Model selector */}
           <select
             value={model}
