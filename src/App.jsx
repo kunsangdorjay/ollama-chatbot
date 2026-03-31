@@ -114,6 +114,10 @@ export default function App() {
         })
       });
 
+      if (!res.ok) {
+        throw new Error(`Server returned ${res.status} ${res.statusText}`);
+      }
+
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
 
@@ -126,11 +130,26 @@ export default function App() {
         setChats(prev =>
           prev.map(c =>
             c.id === activeId
-              ? { ...c, messages: [...c.messages.slice(0, -1), aiMsg] }
+              ? { ...c, messages: [...c.messages.slice(0, -1), { ...aiMsg }] }
               : c
           )
         );
       }
+    } catch (err) {
+      if (err.name === "AbortError") {
+        aiMsg.content += " [Stopped]";
+      } else {
+        console.error("Chat API Error:", err);
+        aiMsg.content = `⚠️ Connection Error!\n\nCould not reach the backend at \`${import.meta.env.VITE_API_URL || "http://localhost:8000"}\`.\n\nMake sure your local FastAPI server is running with \`uvicorn backend.main:app --port 8000\`, or check your Vercel HTTPS mixed-content settings.`;
+      }
+      
+      setChats(prev =>
+        prev.map(c =>
+          c.id === activeId
+            ? { ...c, messages: [...c.messages.slice(0, -1), { ...aiMsg }] }
+            : c
+        )
+      );
     } finally {
       setLoading(false);
       controllerRef.current = null;
