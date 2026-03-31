@@ -4,6 +4,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import requests
 import json
+import os
 
 app = FastAPI()
 
@@ -21,8 +22,7 @@ app.add_middleware(
 # -------------------------
 # Ollama config
 # -------------------------
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL = "mistral:7b-instruct-q4_0"
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
 
 # -------------------------
 # Request schema
@@ -31,16 +31,17 @@ class ChatRequest(BaseModel):
     message: str
     history: list[str] = []
     temperature: float = 0.3
+    model: str = "mistral"
 
 
 # -------------------------
 # Streaming generator (ASYNC)
 # -------------------------
-async def ollama_stream(prompt: str, temperature: float, request: Request):
+async def ollama_stream(prompt: str, temperature: float, model: str, request: Request):
     response = requests.post(
         OLLAMA_URL,
         json={
-            "model": MODEL,
+            "model": model,
             "prompt": prompt,
             "temperature": temperature,
             "num_predict": 256,
@@ -84,6 +85,6 @@ async def chat(req: ChatRequest, request: Request):
     )
 
     return StreamingResponse(
-        ollama_stream(prompt, req.temperature, request),
+        ollama_stream(prompt, req.temperature, req.model, request),
         media_type="text/plain"
     )
