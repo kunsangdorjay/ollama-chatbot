@@ -322,7 +322,7 @@ export default function App() {
     controllerRef.current = controller;
 
     try {
-      const res = await fetch(`${API_URL}/chat`, {
+      const res = await fetch(`${API_URL}/api/chat/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
@@ -343,20 +343,46 @@ export default function App() {
       });
 
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      if (!res.body) throw new Error("Empty response body from server");
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let partial = "";
+      let buffer = "";
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
-        partial += decoder.decode(value);
-        updateActiveChat((c) => {
-          const nextMessages = [...c.messages];
-          const idx = nextMessages.findIndex((m) => m.id === aiMsg.id);
-          if (idx >= 0) nextMessages[idx] = { ...nextMessages[idx], content: partial };
-          return { ...c, messages: nextMessages };
-        });
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          let event;
+          try {
+            event = JSON.parse(line);
+          } catch {
+            continue;
+          }
+          if (event.type === "token") {
+            partial += event.data || "";
+            updateActiveChat((c) => {
+              const nextMessages = [...c.messages];
+              const idx = nextMessages.findIndex((m) => m.id === aiMsg.id);
+              if (idx >= 0) nextMessages[idx] = { ...nextMessages[idx], content: partial };
+              return { ...c, messages: nextMessages };
+            });
+          } else if (event.type === "tool") {
+            partial += `\n[Tool] ${event.data?.tool || "tool"}: ${JSON.stringify(event.data?.result || {})}\n`;
+            updateActiveChat((c) => {
+              const nextMessages = [...c.messages];
+              const idx = nextMessages.findIndex((m) => m.id === aiMsg.id);
+              if (idx >= 0) nextMessages[idx] = { ...nextMessages[idx], content: partial };
+              return { ...c, messages: nextMessages };
+            });
+          } else if (event.type === "error") {
+            throw new Error(event.data?.message || "Streaming error");
+          }
+        }
       }
     } catch (err) {
       const message = err?.name === "AbortError" ? "[Stopped by user]" : "Connection error. Check backend server.";
